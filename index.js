@@ -21,14 +21,23 @@ const elementos = {
     btConfirma: document.querySelector('.confirma'),
     pontuacao: document.querySelector('.pontos'),
     estatisticas: new bootstrap.Modal(document.querySelector('#meu-modal')),
-    estatisticasTexto: document.querySelector('.modal-body'),
+    estatisticasTexto: document.getElementById('texto-estatisticas'),
+    botaoArmazena: document.querySelector('.botao-armazena'),
+    modalArmazena: new bootstrap.Modal(document.querySelector('#modal-questao-armazenada')),
+    btModalSim: document.querySelector('.bt-modal-sim'),
+    btModalNao: document.querySelector('.bt-modal-nao'),
+    letraC: document.getElementById('letra-C'),
+    letraD: document.getElementById('letra-D'),
 };
 
 let quizz = {
     pergunta: undefined,
     respostas: [],
     respostaCerta: undefined,
+    type: undefined,
 };
+
+let perguntaArmazenada = "";
 
 let categorias = [];
 let questaoAtual = 0;
@@ -40,6 +49,8 @@ let dificuldade = '';
 let nomeDificuldade = '';
 let categoria = '';
 let nomeCategoria = '';
+let pontosAdicionais = 0;
+let respondendoQuestaoGuardada = false;
 
 const resetVariaveis = () => {
     categorias = [];
@@ -52,6 +63,7 @@ const resetVariaveis = () => {
     let nomeDificuldade = '';
     categoria = '';
     let nomeCategoria = '';
+    elementos.pontuacao.textContent = pontuacao;
 };
 
 const iniciarMenu = () => {
@@ -83,27 +95,41 @@ const iniciarJogo = () => {
 };
 
 const proximaQuestao = () => {
+    if(perguntaArmazenada != ""){
+        elementos.modalArmazena.show();
+    }
+    
     carregarDados();
-    questaoAtual++;    
 };
 
 const prepararQuestao = () => {
     if(gameOver > 0){   
-        quizz = embaralharRespostas(quizz);
+        quizz = embaralharRespostas(quizz); 
+        elementos.opcoes.opcaoTres.style.display = 'inline';
+        elementos.opcoes.opcaoQuatro.style.display = 'inline';
+        elementos.letraC.style.display = 'inline';
+        elementos.letraD.style.display = 'inline';
+
+        if(quizz.type == "boolean"){
+            elementos.opcoes.opcaoTres.style.display = 'none';
+            elementos.opcoes.opcaoQuatro.style.display = 'none';
+            elementos.letraC.style.display = 'none';
+            elementos.letraD.style.display = 'none';
+        }
+        
         elementos.divPergunta.textContent = quizz.pergunta;
         elementos.opcoes.opcaoUm.textContent = quizz.respostas[0];
         elementos.opcoes.opcaoDois.textContent = quizz.respostas[1];
         elementos.opcoes.opcaoTres.textContent = quizz.respostas[2];
         elementos.opcoes.opcaoQuatro.textContent = quizz.respostas[3];
     } else{
-        console.log(`Pontos: ${pontuacao}`);
         if(categoria == ''){
             categoria = 'Aleatória';
         }
-        elementos.estatisticasTexto.innerHTML = `<div class="mx-auto letra-bonita">Pontuação final: ${pontuacao}</div>
-                                                <div class="mx-auto letra-bonita">Questões respondidas: ${questoesRespondidas}</div>
-                                                <div class="mx-auto letra-bonita">Dificuldade: ${dificuldade}</div>
-                                                <div class="mx-auto letra-bonita">Categoria: ${categoria}</div>`;
+        elementos.estatisticasTexto.innerHTML = `<div class="letra-bonita">Pontuação final: ${pontuacao}</div>
+                                                <div class="letra-bonita">Questões respondidas: ${questoesRespondidas}</div>
+                                                <div class="letra-bonita">Dificuldade: ${dificuldade}</div>
+                                                <div class="letra-bonita">Categoria: ${categoria}</div>`;
         elementos.estatisticas.show();     
         iniciarMenu();
     }
@@ -122,7 +148,6 @@ const embaralharRespostas = (questao) => {
 }
 
 const carregarDados = () => {
-    console.log("bom dia");
     if(elementos.botoes.botaoFacil.classList.contains('isSelected')){
         dificuldade = 'easy';
         nomeDificuldade = '&difficulty=easy';
@@ -150,14 +175,17 @@ const carregarDados = () => {
     axios.get(`${urlBase}api.php?amount=1${nomeCategoria}${nomeDificuldade}`)
     .then(response => {
         const questao = response.data.results[0];
-        console.log(questao);
         quizz.pergunta = questao.question;
         quizz.respostas = [];
+        let i = 0;
+       
         for (const opcao of questao.incorrect_answers) {
-            quizz.respostas.push(opcao);
+            quizz.respostas[i] = opcao;
+            i++;
         }
-        quizz.respostas.push(questao.correct_answer);
+        quizz.respostas[i] = questao.correct_answer;
         quizz.respostaCerta = questao.correct_answer;
+        quizz.type = questao.type;
 
         prepararQuestao(questaoAtual);
     });
@@ -225,51 +253,40 @@ elementos.botoes.botaoDificil.addEventListener('click', () => {
     elementos.botoes.botaoDificil.classList.add('isSelected');
 })
 
+const definePontos = () => {
+    if(dificuldadeAtual == 'easy'){
+        pontosAdicionais = 5;
+    } else if(dificuldadeAtual == 'medium'){
+        pontosAdicionais = 8;
+    } else if(dificuldadeAtual == 'hard'){
+        pontosAdicionais = 10;
+    }
+    
+    if(respondendoQuestaoGuardada == true){
+        pontosAdicionais = pontosAdicionais - 2;
+    }
+
+    if(dificuldadeAtual == 'easy'){
+        pontuacao = parseInt(elementos.pontuacao.textContent) + pontosAdicionais;
+        elementos.pontuacao.textContent = pontuacao;
+    } else if(dificuldadeAtual == 'medium'){
+        pontuacao = parseInt(elementos.pontuacao.textContent) + pontosAdicionais;
+        elementos.pontuacao.textContent = pontuacao;
+    } else if(dificuldadeAtual == 'hard'){
+        pontuacao = parseInt(elementos.pontuacao.textContent) + pontosAdicionais;
+        elementos.pontuacao.textContent = pontuacao;
+    }
+};
+
 const verificarAcerto = () => {
     if(elementos.opcoes.opcaoUm.classList.contains('isSelected') && elementos.opcoes.opcaoUm.textContent == quizz.respostaCerta){
-        if(dificuldadeAtual == 'easy'){
-            pontuacao = +(elementos.pontuacao.textContent) + 5;
-            elementos.pontuacao.textContent = pontuacao;
-        } else if(dificuldadeAtual == 'medium'){
-            pontuacao = parseInt(elementos.pontuacao.textContent) + 8;
-            elementos.pontuacao.textContent = pontuacao;
-        } else if(dificuldadeAtual == 'hard'){
-            pontuacao = parseInt(elementos.pontuacao.textContent) + 10;
-            elementos.pontuacao.textContent = pontuacao;
-        }
+        definePontos();
     } else if(elementos.opcoes.opcaoDois.classList.contains('isSelected') && elementos.opcoes.opcaoDois.textContent == quizz.respostaCerta){
-        if(dificuldadeAtual == 'easy'){
-            pontuacao = +(elementos.pontuacao.textContent) + 5;
-            elementos.pontuacao.textContent = pontuacao;
-        } else if(dificuldadeAtual == 'medium'){
-            pontuacao = parseInt(elementos.pontuacao.textContent) + 8;
-            elementos.pontuacao.textContent = pontuacao;
-        } else if(dificuldadeAtual == 'hard'){
-            pontuacao = parseInt(elementos.pontuacao.textContent) + 10;
-            elementos.pontuacao.textContent = pontuacao;
-        }
+        definePontos();
     } else if(elementos.opcoes.opcaoTres.classList.contains('isSelected') && elementos.opcoes.opcaoTres.textContent == quizz.respostaCerta){
-        if(dificuldadeAtual == 'easy'){
-            pontuacao = +(elementos.pontuacao.textContent) + 5;
-            elementos.pontuacao.textContent = pontuacao;
-        } else if(dificuldadeAtual == 'medium'){
-            pontuacao = parseInt(elementos.pontuacao.textContent) + 8;
-            elementos.pontuacao.textContent = pontuacao;
-        } else if(dificuldadeAtual == 'hard'){
-            pontuacao = parseInt(elementos.pontuacao.textContent) + 10;
-            elementos.pontuacao.textContent = pontuacao;
-        }
+        definePontos();
     } else if(elementos.opcoes.opcaoQuatro.classList.contains('isSelected') && elementos.opcoes.opcaoQuatro.textContent == quizz.respostaCerta){
-        if(dificuldadeAtual == 'easy'){
-            pontuacao = +(elementos.pontuacao.textContent) + 5;
-            elementos.pontuacao.textContent = pontuacao;
-        } else if(dificuldadeAtual == 'medium'){
-            pontuacao = parseInt(elementos.pontuacao.textContent) + 8;
-            elementos.pontuacao.textContent = pontuacao;
-        } else if(dificuldadeAtual == 'hard'){
-            pontuacao = parseInt(elementos.pontuacao.textContent) + 10;
-            elementos.pontuacao.textContent = pontuacao;
-        }
+        definePontos();
     } else{
         gameOver--;
         if(dificuldadeAtual == 'easy'){
@@ -282,6 +299,10 @@ const verificarAcerto = () => {
             pontuacao = parseInt(elementos.pontuacao.textContent) - 10; 
             elementos.pontuacao.textContent = pontuacao;
         }
+    }
+    if(respondendoQuestaoGuardada == true){
+        perguntaArmazenada = "";
+        respondendoQuestaoGuardada = false;
     }
 };
 
@@ -316,6 +337,9 @@ elementos.btConfirma.addEventListener('click', () => {
         elementos.opcoes.opcaoTres.classList.remove('errado');
         elementos.opcoes.opcaoQuatro.classList.remove('certo');
         elementos.opcoes.opcaoQuatro.classList.remove('errado');
+        if(perguntaArmazenada == ""){
+            elementos.botaoArmazena.disabled = false;
+        }
         proximaQuestao();
     }
 });
@@ -354,6 +378,20 @@ elementos.opcoes.opcaoQuatro.addEventListener('click', () => {
     buttonReset(elementos.opcoes.opcaoQuatro);
 
     elementos.opcoes.opcaoQuatro.classList.add('isSelected');
+});
+
+elementos.botaoArmazena.addEventListener('click', () => {
+    if(perguntaArmazenada == ""){
+        elementos.botaoArmazena.disabled = true;
+        perguntaArmazenada = JSON.stringify(quizz);
+        proximaQuestao();
+    }
+});
+
+elementos.btModalSim.addEventListener('click', () => {
+    quizz = JSON.parse(perguntaArmazenada);
+    respondendoQuestaoGuardada = true;
+    prepararQuestao();
 });
 
 iniciarMenu();

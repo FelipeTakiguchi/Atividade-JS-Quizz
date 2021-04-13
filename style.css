@@ -4,7 +4,7 @@
 
 .titulo {
     margin-top: 50px;
-    margin-left: 680px;
+    margin-left: 550px;
     font-size: 60px;
     font-family:Georgia, 'Times New Roman', Times, serif;
     font-style: italic;
@@ -17,16 +17,12 @@
     display: flex;
     position: relative;
     justify-content: center;
-    margin-top: 30px;
 }
 
 .principal {
     align-items: center;
     width: 1200px;
     height: 550px;
-    background-color:teal;
-    border-color:orange;
-    border-radius: 3%;
 }
 
 .dificuldades button {
@@ -43,18 +39,19 @@
 }
 
 .categorias {
-    margin-top: 150px;
-    margin-right: 200px;
+    margin-top: 150px; 
+    margin-right: 150px;
 }
 
 .botao-start {
+    width: 200px;
     font-size: 27px;
     color: lightblue;
     border-width: 10px;
 }
 
-.quzz {
-    background-image: url("img/Quizz.jpeg");
+.quizz {
+    margin-left: 50px;
 }
 
 .div-pontos {
@@ -62,6 +59,9 @@
     margin-left: 20px;
     font-size: 30px;
     size: 50px;
+    font-family: monospace;
+    font-style: italic;
+    font-weight: bolder;
 }
 
 .letra-bonita {
@@ -93,12 +93,13 @@
 }
 
 .quadro #opcao-um, #opcao-dois, #opcao-tres, #opcao-quatro{
-    font-size: 22px;
+    font-size: 18px;
     font-family: 'Courier New', Courier, monospace;
     font-style: inherit;
     width: 320px;
     height: 130px;
-    margin-top: 30px;
+    margin-top: 10px;
+    margin-bottom: 20px;
     font-style: oblique;
     border-color: goldenrod;
     border-width: 1ch;
@@ -113,8 +114,8 @@
     font-size: 20px;
     font-weight: bold;
     font-family: 'Courier New', Courier, monospace;
-    margin-left: 550px;
-    margin-top: 25px;
+    margin-left: 400px;
+    margin-right: 50px;
 }
 
 .isSelected {
@@ -143,4 +144,16 @@
 
 .errado {
     background-color: red;
+}
+
+.botao-armazena {
+    background-color: royalblue;
+    border-color:royalblue;
+    border-width: 10px;
+    width: 160px;
+    height: 60px;
+    font-size: 14px;
+    font-weight: bold;
+    font-family: 'Courier New', Courier, monospace;
+    margin-right: 50px;
 }
