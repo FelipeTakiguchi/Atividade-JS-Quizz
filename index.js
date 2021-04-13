@@ -310,6 +310,7 @@ elementos.btConfirma.addEventListener('click', () => {
     if(elementos.btConfirma.textContent != '' && (elementos.opcoes.opcaoUm.classList.contains('isSelected') || (elementos.opcoes.opcaoDois.classList.contains('isSelected')) || elementos.opcoes.opcaoTres.classList.contains('isSelected') || elementos.opcoes.opcaoQuatro.classList.contains('isSelected'))){
         elementos.opcoes.opcaoUm.disabled = true;
         elementos.opcoes.opcaoDois.disabled = true;
+        elementos.botaoArmazena.disabled = true;
         elementos.opcoes.opcaoTres.disabled = true;
         elementos.opcoes.opcaoQuatro.disabled = true;
         elementos.btConfirma.textContent = '';
@@ -322,6 +323,7 @@ elementos.btConfirma.addEventListener('click', () => {
         buttonReset(elementos.opcoes.opcaoDois);
         buttonReset(elementos.opcoes.opcaoTres);
         buttonReset(elementos.opcoes.opcaoQuatro);
+        elementos.botaoArmazena.disabled = false;
         elementos.opcoes.opcaoUm.disabled = false;
         elementos.opcoes.opcaoDois.disabled = false;
         elementos.opcoes.opcaoTres.disabled = false;

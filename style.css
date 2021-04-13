@@ -106,6 +106,7 @@
 }
 
 .confirma {
+    position: relative;
     background-color:greenyellow;
     border-color:greenyellow;
     border-width: 10px;
@@ -147,6 +148,7 @@
 }
 
 .botao-armazena {
+    position: fixed;
     background-color: royalblue;
     border-color:royalblue;
     border-width: 10px;
