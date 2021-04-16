@@ -3,8 +3,8 @@
 }
 
 .titulo {
-    margin-top: 50px;
-    margin-left: 550px;
+    margin-top: 20px;
+    margin-left: 45%;
     font-size: 60px;
     font-family:Georgia, 'Times New Roman', Times, serif;
     font-style: italic;
@@ -36,6 +36,10 @@
     border-width: 1ch;
     margin-left: 200px;
     margin-top: 63px
+}
+
+.button-pressed {
+    background-color: black;
 }
 
 .categorias {
@@ -92,7 +96,11 @@
     
 }
 
-.quadro #opcao-um, #opcao-dois, #opcao-tres, #opcao-quatro{
+.quadro {
+    margin-left: 10%;
+}
+
+#opcao-um, #opcao-dois, #opcao-tres, #opcao-quatro{
     font-size: 18px;
     font-family: 'Courier New', Courier, monospace;
     font-style: inherit;

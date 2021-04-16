@@ -28,6 +28,8 @@ const elementos = {
     btModalNao: document.querySelector('.bt-modal-nao'),
     letraC: document.getElementById('letra-C'),
     letraD: document.getElementById('letra-D'),
+    progress: document.getElementById('progress'),
+    timer: document.getElementById('timer'),
 };
 
 let quizz = {
@@ -64,6 +66,9 @@ const resetVariaveis = () => {
     categoria = '';
     let nomeCategoria = '';
     elementos.pontuacao.textContent = pontuacao;
+    elementos.botoes.botaoFacil.classList.remove('button-pressed');
+    elementos.botoes.botaoMedio.classList.remove('button-pressed');
+    elementos.botoes.botaoDificil.classList.remove('button-pressed');
 };
 
 const iniciarMenu = () => {
@@ -102,8 +107,27 @@ const proximaQuestao = () => {
     carregarDados();
 };
 
+function decodeHTMLEntities(text) {
+    var textArea = document.createElement('textarea');
+    textArea.innerHTML = text;
+    return textArea.value;
+}
+
 const prepararQuestao = () => {
     if(gameOver > 0){   
+        elementos.botaoArmazena.disabled = false;
+        elementos.opcoes.opcaoUm.disabled = false;
+        elementos.opcoes.opcaoDois.disabled = false;
+        elementos.opcoes.opcaoTres.disabled = false;
+        elementos.opcoes.opcaoQuatro.disabled = false;
+        elementos.opcoes.opcaoUm.classList.remove('certo');
+        elementos.opcoes.opcaoUm.classList.remove('errado');
+        elementos.opcoes.opcaoDois.classList.remove('certo');
+        elementos.opcoes.opcaoDois.classList.remove('errado');
+        elementos.opcoes.opcaoTres.classList.remove('certo');
+        elementos.opcoes.opcaoTres.classList.remove('errado');
+        elementos.opcoes.opcaoQuatro.classList.remove('certo');
+        elementos.opcoes.opcaoQuatro.classList.remove('errado');
         quizz = embaralharRespostas(quizz); 
         elementos.opcoes.opcaoTres.style.display = 'inline';
         elementos.opcoes.opcaoQuatro.style.display = 'inline';
@@ -116,12 +140,16 @@ const prepararQuestao = () => {
             elementos.letraC.style.display = 'none';
             elementos.letraD.style.display = 'none';
         }
-        
+
+        quizz.pergunta = decodeHTMLEntities(quizz.pergunta);
+
         elementos.divPergunta.textContent = quizz.pergunta;
         elementos.opcoes.opcaoUm.textContent = quizz.respostas[0];
         elementos.opcoes.opcaoDois.textContent = quizz.respostas[1];
         elementos.opcoes.opcaoTres.textContent = quizz.respostas[2];
         elementos.opcoes.opcaoQuatro.textContent = quizz.respostas[3];
+        
+        iniciarProgress();
     } else{
         if(categoria == ''){
             categoria = 'Aleatória';
@@ -233,6 +261,9 @@ elementos.botoes.botaoFacil.addEventListener('click', () => {
     elementos.botoes.botaoFacil.classList.add('isSelected');
     elementos.botoes.botaoMedio.classList.add('notSelected');
     elementos.botoes.botaoDificil.classList.add('notSelected');
+    elementos.botoes.botaoDificil.classList.remove('button-pressed');
+    elementos.botoes.botaoMedio.classList.remove('button-pressed');
+    elementos.botoes.botaoFacil.classList.add('button-pressed');
 })
 
 elementos.botoes.botaoMedio.addEventListener('click', () => {
@@ -242,6 +273,9 @@ elementos.botoes.botaoMedio.addEventListener('click', () => {
     elementos.botoes.botaoFacil.classList.add('notSelected');
     elementos.botoes.botaoMedio.classList.add('isSelected');
     elementos.botoes.botaoDificil.classList.add('notSelected');
+    elementos.botoes.botaoFacil.classList.remove('button-selected');
+    elementos.botoes.botaoDificil.classList.remove('button-selected');
+    elementos.botoes.botaoMedio.classList.add('button-pressed');
 })
 
 elementos.botoes.botaoDificil.addEventListener('click', () => {
@@ -251,6 +285,9 @@ elementos.botoes.botaoDificil.addEventListener('click', () => {
     elementos.botoes.botaoFacil.classList.add('notSelected');
     elementos.botoes.botaoMedio.classList.add('notSelected');
     elementos.botoes.botaoDificil.classList.add('isSelected');
+    elementos.botoes.botaoFacil.classList.remove('button-selected');
+    elementos.botoes.botaoMedio.classList.remove('button-selected');
+    elementos.botoes.botaoDificil.classList.add('button-pressed');
 })
 
 const definePontos = () => {
@@ -345,6 +382,55 @@ elementos.btConfirma.addEventListener('click', () => {
         proximaQuestao();
     }
 });
+
+iniciarProgress = () => {
+        
+    let contagem = 0;
+    let total = 0;
+
+    if(dificuldade == 'easy'){
+        contagem = 1500;
+    } else if(dificuldade == 'medium'){
+        contagem = 3000;
+    } else if(dificuldade == 'hard'){
+        contagem = 4000;
+    }
+
+    total = contagem;
+    elementos.progress.setAttribute("style",`width: 100%;`)
+    elementos.progress.setAttribute("aria-valuenow",`100`)
+
+    const interval = setInterval(() => {
+        elementos.timer.textContent = `Tempo: ${contagem / 100}`;
+        --contagem;
+
+        const aux = contagem * 100 / total;
+    
+        elementos.progress.setAttribute("style",`width: ${Math.round(aux)}%;`);
+        elementos.progress.setAttribute("aria-valuenow",`${Math.round(aux)}`);
+        
+        if (aux <= 60){
+            elementos.progress.classList.remove('bg-success');
+            elementos.progress.classList.add('bg-warning');
+        }
+        else if (aux <= 30){
+            elementos.progress.classList.remove('bg-warning');
+            elementos.progress.classList.add('bg-danger');
+        } else {
+            elementos.progress.classList.remove('bg-danger');
+            elementos.progress.classList.add('bg-success');
+        }
+        if (contagem == 0) {
+            mostrarFeedBack(quizz);
+            clearInterval(interval);
+            
+            setTimeout(() => {
+                verificarAcerto();
+                proximaQuestao();
+            },2000)
+        }
+    }, 10);
+}
 
 elementos.opcoes.opcaoUm.addEventListener('click', () => {
     buttonReset(elementos.opcoes.opcaoUm);
