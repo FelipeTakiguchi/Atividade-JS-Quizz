@@ -409,17 +409,19 @@ iniciarProgress = () => {
         elementos.progress.setAttribute("style",`width: ${Math.round(aux)}%;`);
         elementos.progress.setAttribute("aria-valuenow",`${Math.round(aux)}`);
         
+        if (aux <= 100) {
+            elementos.progress.classList.add('bg-success');        
+            elementos.progress.classList.remove('bg-danger');
+        }
         if (aux <= 60){
             elementos.progress.classList.remove('bg-success');
             elementos.progress.classList.add('bg-warning');
         }
-        else if (aux <= 30){
+        if (aux <= 30){
             elementos.progress.classList.remove('bg-warning');
             elementos.progress.classList.add('bg-danger');
-        } else {
-            elementos.progress.classList.remove('bg-danger');
-            elementos.progress.classList.add('bg-success');
         }
+        
         if (contagem == 0) {
             mostrarFeedBack(quizz);
             clearInterval(interval);
